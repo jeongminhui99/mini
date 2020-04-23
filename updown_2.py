@@ -1,16 +1,32 @@
 import random 
 
+nickname = [] # 이름 기록 리스트 
+score = [] # 지금까지 점수 기록
+
 def rand(): # rand함수 (컴퓨터 1부터 100까지 수 중에서 하나를 랜덤으로 골라주고 리턴해줌)
     num = random.randrange(1, 101)
     return num
 
+def put(a): # 최고기록 시 파일에 작성 함수 --> 피드백 2
+    
+    f=open("score.txt", 'a') #파일 추가 모드
+    history = name+' '+str(a)+'\n' #나중에 불러올때 구분 기준으로 쓰기 위해 개행문자를 넣는다.
+    f.write(history) #파일에 추가 최신 기록 아래에 한줄씩 추가됨
+    f.close()
 
-
+def read():
+    score.clear()
+    f=open("/Users/user/Documents/SWING/Python/score.txt", 'r') # 파일에서 읽어오기 r
+    line=f.readlines() # 문자열로 불러와서 lines에 담기
+    for i in range(0, len(line)):
+        linesplit=line[i].split(' ') # 띄어쓰기를 기준으로 이름과 점수 나누기
+        num = int(linesplit[1]) # 점수가 뒤쪽이므로 [1] 
+        score.append(num) # 점수 리스트에 점수만 저장후 오름차순으로 나열
+        score.sort()
+    f.close()
 
 print("UP & DOWN 게임에 오신 걸 환영합니다~")
-nickname = [] # 이름 기록 리스트 
-score = [] # 지금까지 점수 기록
-buf = [] # 이름 + 점수 리스트
+read()
 while 1:
     print("\n1. 게임시작 2. 기록확인 3. 게임종료")
     menu = int(input('>> '))
@@ -38,32 +54,21 @@ while 1:
                 print('정답입니다!!')
                 print('%d번째만에 맞추셨습니다' %count) # 몇 번째로 맞췄는지 count로 알려줌
                 if not score:
-                    print('최고기록 갱신~!\n') # 점수리스트에 아무것도 없으면 최고점수
+                    print("최고기록 갱신~!\n")
                     name=input('닉네임을 입력하세요 >> ') 
+                    put(count) # --> 피드백 2
                     score.append(count) # 점수 리스트에 점수 추가
                     nickname.append(name) # 이름 리스트 맨 앞에 이름 추가
                     score.sort() # 리스트 오름차순으로 정렬해놓기(가장 작은수가 앞에 오므로 자동으로 1등이 score[0]이다.)
-                    buf=[] # 값을 초기화 ( 이유 : 순위 순으로 넣어주기 위해 )
-                    for i in range(0,len(score)): # 지금까지 기록된 기록 갯수
-                        buf.append(nickname[i] + ' ' + str(score[i])) # buf 리스트에 닉네임 점수 형식으로 입력하기 위해
-                    f=open("/Users/user/Documents/SWING/Python/score.txt", 'w') # buf 리스트에 순위 순으로 정보가 있으므로 w로 해준다.
-                    for i in range(0,len(buf)): 
-                        f.write(buf[i]+'\n') # 한줄씩 사용자의 닉네임과 점수 파일에 쓰기
-                    f.close()
                     break  
                 elif count < score[0]: # 1등 기록인 score[0]보다 작으면 최고 점수
-                    print('최고기록 갱신~!\n')
-                    name=input('닉네임을 입력하세요 >> ') # 닉네임 입력 받은 것 name변수에 저장
+                    print("최고기록 갱신~!\n")
+                    name=input('닉네임을 입력하세요 >> ') 
+                    put(count) # --> 피드백 2
                     score.append(count) # 점수 리스트에 점수 추가
                     nickname.insert(0, name) # 이름 리스트 맨 앞에 이름 추가
                     score.sort() # 리스트 오름차순으로 정렬해놓기(가장 작은수가 앞에 오므로 자동으로 1등이 score[0]이다.)
-                    buf=[]
-                    for i in range(0,len(score)): # 지금까지 기록된 기록 갯수
-                        buf.append(nickname[i] + ' ' + str(score[i])) # buf 리스트에 닉네임 점수 형식으로 입력하기 위해
-                    f=open("/Users/user/Documents/SWING/Python/score.txt", 'w') # buf 리스트에 순위 순으로 정보가 있으므로 w로 해준다.
-                    for i in range(0,len(buf)):
-                        f.write(buf[i]+'\n') # 한줄씩 사용자의 닉네임과 점수 파일에 쓰기
-                    f.close()
+                    
                     break
                 else : # 1번 피드백 -> 최고기록 갱신을 하지 않았을때는 아무것도 기록하지 않고 넘어간다.
                     break
@@ -78,10 +83,13 @@ while 1:
         lines=f.read() # 문자열로 불러와서 lines에 담기
         if lines: # 읽어온 것이 있다면
             result=lines.split('\n') # 개행 문자을 기준으로 분리
-            for i in range(0,len(result)-1):
-                print(i+1, result[i]) # 1 mini 3 이라면 1은 (i+1) mini 3은 (result[i])
+
+            for i in range(len(result)-1, 0, -1): # 파일 아랫줄 부터 출력(최신 순)
+                print(len(result)-i, result[i-1])
+        
         else : # 읽어온 데이터가 없다면
             print("아직 기록이 없습니다.")
+
         f.close()
     
     elif menu == 3 : # 게임종료
