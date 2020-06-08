@@ -19,30 +19,28 @@ html = urllib.request.urlopen(big)
 result = BeautifulSoup(html.read(), "html.parser")
 
 array=[]
-list=result.select('td > a')
+list=result.findAll("td", {"class", "title"})
 for s in list:
-    if ('https' in s['href']): 
-        continue
-    array.append(s['href']) # 전체 리스트 화면에서 각 화의 링크를 리스트에 담기
+    print(s.find("a")['href'])
+    array.append(s.find("a")['href']) # 전체 리스트 화면에서 각 화의 링크를 리스트에 담기
 
 
 for i in range(len(array)):
-    if i%2==0 :
-        url="https://comic.naver.com"+array[i]
-        html2 = urllib.request.urlopen(url)
-        result2 = BeautifulSoup(html2.read(), "html.parser")
-        search=result2.findAll("img", {"alt" : "comic content"})
-        name=result2.findAll("meta", {"property" : "og:description"})
-        for s in name:
-            print(s['content'])
-            little=s['content']
-            os.chdir("/Users/user/Desktop/"+title)
-            os.mkdir(s['content']) 
-        i=1
-        for s in search:
-            picture = s['src']
-            outpath='C:/Users/user/Desktop/'+title+'/'+little+'/'
-            outfile=str(i)+'.jpg'
-            urllib.request.urlretrieve(picture, outpath+outfile)
-            i += 1
+    url="https://comic.naver.com"+array[i]
+    html2 = urllib.request.urlopen(url)
+    result2 = BeautifulSoup(html2.read(), "html.parser")
+    search=result2.findAll("img", {"alt" : "comic content"})
+    name=result2.findAll("meta", {"property" : "og:description"})
+    for s in name:
+        print(s['content'])
+        little=s['content']
+        os.chdir("/Users/user/Desktop/"+title)
+        os.mkdir(s['content']) 
+    i=1
+    for s in search:
+        picture = s['src']
+        outpath='C:/Users/user/Desktop/'+title+'/'+little+'/'
+        outfile=str(i)+'.jpg'
+        urllib.request.urlretrieve(picture, outpath+outfile)
+        i += 1
        
